@@ -400,14 +400,13 @@ const (
 	KindGKE
 	KindAKS
 	KindMicrok8s
+	KindK3s
 )
 
 func (k Kind) String() string {
 	switch k {
 	case KindUnknown:
 		return "unknown"
-	case KindMicrok8s:
-		return "microk8s"
 	case KindMinikube:
 		return "minikube"
 	case KindKind:
@@ -418,6 +417,10 @@ func (k Kind) String() string {
 		return "GKE"
 	case KindAKS:
 		return "AKS"
+	case KindMicrok8s:
+		return "microk8s"
+	case KindK3s:
+		return "K3s"
 	default:
 		return "invalid"
 	}
