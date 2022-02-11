@@ -1081,7 +1081,7 @@ type Parameters struct {
 	ConfigOverwrites      []string
 	configOverwrites      map[string]string
 	Rollback              bool
-
+	All                   bool
 	// CiliumReadyTimeout defines the wait timeout for Cilium to become ready
 	// after installing.
 	CiliumReadyTimeout time.Duration

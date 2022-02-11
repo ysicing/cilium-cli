@@ -111,7 +111,7 @@ func newCmdUninstall() *cobra.Command {
 	cmd.Flags().StringVar(&params.TestNamespace, "test-namespace", defaults.ConnectivityCheckNamespace, "Namespace to uninstall Cilium tests from")
 	cmd.Flags().StringVar(&contextName, "context", "", "Kubernetes configuration context")
 	cmd.Flags().BoolVar(&params.Wait, "wait", false, "Wait for uninstallation to have completed")
-
+	cmd.Flags().BoolVar(&params.All, "all", false, "Delete all resources created by Cilium")
 	return cmd
 }
 

@@ -93,6 +93,11 @@ func (k *K8sUninstaller) Uninstall(ctx context.Context) error {
 		k.client.DeleteDaemonSet(ctx, k.params.Namespace, nodeInitName(k.flavor.Kind), metav1.DeleteOptions{})
 	}
 
+	if k.params.All {
+		k.Log("🔥 Deleting crds...")
+		k.client.DeleteDynamicResource(ctx, metav1.DeleteOptions{})
+	}
+
 	if k.params.Wait {
 		k.Log("⌛ Waiting for Cilium to be uninstalled...")
 

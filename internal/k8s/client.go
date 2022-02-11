@@ -390,6 +390,11 @@ func (c *Client) DeleteDaemonSet(ctx context.Context, namespace, name string, op
 	return c.Clientset.AppsV1().DaemonSets(namespace).Delete(ctx, name, opts)
 }
 
+func (c *Client) DeleteDynamicResource(ctx context.Context, opts metav1.DeleteOptions) error {
+	// TODO: Remove this once the API server supports dynamic resources
+	return nil
+}
+
 type Kind int
 
 const (
