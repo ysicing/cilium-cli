@@ -25,6 +25,9 @@ import (
 	"google.golang.org/grpc/internal/envconfig"
 )
 
+// FederationScheme is the scheme of a federation resource name.
+const FederationScheme = "xdstp"
+
 // Name contains the parsed component of an xDS resource name.
 //
 // An xDS resource name is in the format of
@@ -116,7 +119,7 @@ func (n *Name) String() string {
 
 	path := n.Type
 	if n.ID != "" {
-		path = path + "/" + n.ID
+		path = "/" + path + "/" + n.ID
 	}
 
 	tempURL := &url.URL{
