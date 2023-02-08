@@ -36,16 +36,12 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-// UnmarshalListener processes resources received in an LDS response, validates
-// them, and transforms them into a native struct which contains only fields we
-// are interested in.
-func UnmarshalListener(opts *UnmarshalOptions) (map[string]ListenerUpdateErrTuple, UpdateMetadata, error) {
-	update := make(map[string]ListenerUpdateErrTuple)
-	md, err := processAllResources(opts, update)
-	return update, md, err
-}
+func unmarshalListenerResource(r *anypb.Any, logger *grpclog.PrefixLogger) (string, ListenerUpdate, error) {
+	r, err := unwrapResource(r)
+	if err != nil {
+		return "", ListenerUpdate{}, fmt.Errorf("failed to unwrap resource: %v", err)
+	}
 
-func unmarshalListenerResource(r *anypb.Any, f UpdateValidatorFunc, logger *grpclog.PrefixLogger) (string, ListenerUpdate, error) {
 	if !IsListenerResource(r.GetTypeUrl()) {
 		return "", ListenerUpdate{}, fmt.Errorf("unexpected resource type: %q ", r.GetTypeUrl())
 	}
@@ -60,11 +56,6 @@ func unmarshalListenerResource(r *anypb.Any, f UpdateValidatorFunc, logger *grpc
 	lu, err := processListener(lis, logger, v2)
 	if err != nil {
 		return lis.GetName(), ListenerUpdate{}, err
-	}
-	if f != nil {
-		if err := f(*lu); err != nil {
-			return lis.GetName(), ListenerUpdate{}, err
-		}
 	}
 	lu.Raw = r
 	return lis.GetName(), *lu, nil
@@ -102,8 +93,8 @@ func processClientSideListener(lis *v3listenerpb.Listener, logger *grpclog.Prefi
 
 	switch apiLis.RouteSpecifier.(type) {
 	case *v3httppb.HttpConnectionManager_Rds:
-		if apiLis.GetRds().GetConfigSource().GetAds() == nil {
-			return nil, fmt.Errorf("ConfigSource is not ADS: %+v", lis)
+		if configsource := apiLis.GetRds().GetConfigSource(); configsource.GetAds() == nil && configsource.GetSelf() == nil {
+			return nil, fmt.Errorf("LDS's RDS configSource is not ADS or Self: %+v", lis)
 		}
 		name := apiLis.GetRds().GetRouteConfigName()
 		if name == "" {
